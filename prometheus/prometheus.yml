@@ -13,11 +13,3 @@ scrape_configs:
       - targets: ['otel-collector:8889']
         labels:
           group: 'otel-collector'
-
-  - job_name: 'spring-boot-apps'
-    scrape_interval: 5s
-    metrics_path: '/actuator/prometheus'
-    static_configs:
-      - targets: ['host.docker.internal:8080']
-        labels:
-          application: 'spring-boot-app'
