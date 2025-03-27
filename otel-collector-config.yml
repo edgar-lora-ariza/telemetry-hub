@@ -9,19 +9,31 @@ receivers:
 processors:
   batch:
 
+  attributes:
+    actions:
+      - key: loki.attribute.labels
+        value: "service.name,service.namespace,host.name"
+        action: upsert
+
 exporters:
   prometheus:
     endpoint: 0.0.0.0:8889
-  
+
   otlp/tempo:
     endpoint: tempo:4317
     tls:
       insecure: true
 
-  loki:
+  splunk_hec:
     endpoint: http://loki:3100/loki/api/v1/push
+    token: "dummy-token"
+    source: "otel"
+    sourcetype: "otel:log"
+    index: "main"
     tls:
       insecure: true
+    log_data_enabled: true
+    profiling_data_enabled: false
 
   debug:
     verbosity: detailed
@@ -37,7 +49,12 @@ service:
       receivers: [otlp]
       processors: [batch]
       exporters: [otlp/tempo, debug]
-      
+
+    logs:
+      receivers: [otlp]
+      processors: [batch, attributes]
+      exporters: [splunk_hec, debug]
+
   telemetry:
     logs:
       level: info
