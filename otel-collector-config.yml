@@ -24,16 +24,8 @@ exporters:
     tls:
       insecure: true
 
-  splunk_hec:
+  loki:
     endpoint: http://loki:3100/loki/api/v1/push
-    token: "dummy-token"
-    source: "otel"
-    sourcetype: "otel:log"
-    index: "main"
-    tls:
-      insecure: true
-    log_data_enabled: true
-    profiling_data_enabled: false
 
   debug:
     verbosity: detailed
@@ -53,7 +45,7 @@ service:
     logs:
       receivers: [otlp]
       processors: [batch, attributes]
-      exporters: [splunk_hec, debug]
+      exporters: [loki, debug]
 
   telemetry:
     logs:
