@@ -43,7 +43,7 @@ This repository contains the Docker Compose configuration needed to implement a 
 docker-compose up -d
 ```
 
-3. Access Grafana at http://localhost:3000 (username: admin, password: admin)
+3. Access Grafana at http://localhost:3000 (username: admin, password: Pwd.1234!)
 
 ## Component Configuration
 
