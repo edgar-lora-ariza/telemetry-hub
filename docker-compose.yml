@@ -1,0 +1,114 @@
+version: '3.8'
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+    restart: unless-stopped
+    networks:
+      - monitoring-network
+    depends_on:
+      - prometheus
+      - loki
+      - tempo
+      
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    restart: unless-stopped
+    networks:
+      - monitoring-network
+      
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    user: root
+    volumes:
+      - ./loki/local-config.yaml:/etc/loki/local-config.yaml
+      - loki-chunks:/loki/chunks
+      - loki-index:/loki/tsdb-index
+      - loki-cache:/loki/tsdb-cache
+      - loki-rules:/loki/rules
+      - loki-compactor:/loki/compactor
+    restart: unless-stopped
+    networks:
+      - monitoring-network
+      
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    command: -config.file=/etc/tempo/tempo-local.yaml
+    user: root
+    volumes:
+      - ./tempo/tempo-local.yaml:/etc/tempo/tempo-local.yaml
+      - tempo-data:/tmp/tempo
+    ports:
+      - "3200:3200"
+      - "4317:4317"
+      # Eliminamos el mapeo de puerto 4318 para Tempo
+    restart: unless-stopped
+    networks:
+      - monitoring-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3200/ready"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+      
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    command: ["--config=/etc/otel-collector-config.yml"]
+    volumes:
+      - ./otel-collector-config.yml:/etc/otel-collector-config.yml
+    ports:
+      - "4318:4318"
+      - "8889:8889"
+    restart: unless-stopped
+    networks:
+      - monitoring-network
+    depends_on:
+      tempo:
+        condition: service_healthy
+      prometheus:
+        condition: service_started
+      loki:
+        condition: service_started
+
+volumes:
+  grafana-storage:
+  prometheus-data:
+  loki-chunks:
+  loki-index:
+  loki-cache:
+  loki-rules:
+  loki-compactor:
+  tempo-data:
+
+networks:
+  monitoring-network:
+    driver: bridge
