@@ -12,7 +12,7 @@ processors:
   attributes:
     actions:
       - key: loki.attribute.labels
-        value: "service.name,service.namespace,host.name"
+        value: "service.name,service.namespace,service.environment"
         action: upsert
 
 exporters:
@@ -49,4 +49,4 @@ service:
 
   telemetry:
     logs:
-      level: info
+      level: debug
