@@ -8,9 +8,7 @@ datasources:
     isDefault: true
     editable: true
     jsonData:
-      exemplarTraceIdDestinations:
-        - name: trace_id
-          datasourceUid: tempo
+      httpMethod: POST
 
   - name: Loki
     type: loki
@@ -30,17 +28,15 @@ datasources:
       tracesToLogsV2:
         datasourceUid: Loki
         customQuery: true
-        query: '{exporter="OTLP"} | json | resources_service_name="${__tags.service.name}" |= "${__tags.traceId}"'
+        query: '{service_name="${__span.tags["service.namespace"]}/${__span.tags["service.name"]}"} |= "${__span.traceId}"'
       tracesToMetrics:
         datasourceUid: Prometheus
         tags:
           - key: service.name
-            value: service_name
-          - key: span.name
-            value: span_name
+            value: server
         queries:
-          - query: 'authors_operations_total{$__tags}[$__range]'
-            link_label: 'Authors Operations Total'
+          - query: 'sum by(client, server)(rate(graphql_datafetcher_milliseconds_bucket($__tags)[$__rate_interval]))'
+            link_label: 'Request rate'
       search:
         hide: false
       nodeGraph:
