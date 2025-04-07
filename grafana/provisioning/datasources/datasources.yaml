@@ -28,7 +28,7 @@ datasources:
       tracesToLogsV2:
         datasourceUid: Loki
         customQuery: true
-        query: '{service_name="${__span.tags["service.namespace"]}/${__span.tags["service.name"]}"} |= "${__span.traceId}"'
+        query: '{job="${__span.tags["service.namespace"]}/${__span.tags["service.name"]}"} |= "${__span.traceId}"'
       tracesToMetrics:
         datasourceUid: Prometheus
         tags:

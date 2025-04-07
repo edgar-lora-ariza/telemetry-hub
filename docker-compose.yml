@@ -29,6 +29,7 @@ services:
       - '--web.console.libraries=/etc/prometheus/console_libraries'
       - '--web.console.templates=/etc/prometheus/consoles'
       - '--web.enable-lifecycle'
+      - '--web.enable-remote-write-receiver'
       - '--enable-feature=exemplar-storage'
     ports:
       - "9090:9090"
@@ -76,7 +77,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 3
-      start_period: 5s
+      start_period: 10s
       
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.96.0-arm64
