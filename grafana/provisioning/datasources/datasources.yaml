@@ -31,11 +31,8 @@ datasources:
         query: '{job="${__span.tags["service.namespace"]}/${__span.tags["service.name"]}"} |= "${__span.traceId}"'
       tracesToMetrics:
         datasourceUid: Prometheus
-        tags:
-          - key: service.name
-            value: server
         queries:
-          - query: 'sum by(client, server)(rate(graphql_datafetcher_milliseconds_bucket($__tags)[$__rate_interval]))'
+          - query: 'sum(rate(http_server_request_duration_seconds_count{job="${__span.tags["service.name"]}"}[$__rate_interval]))'
             link_label: 'Request rate'
       search:
         hide: false
