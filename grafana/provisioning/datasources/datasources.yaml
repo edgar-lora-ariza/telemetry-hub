@@ -11,7 +11,7 @@ datasources:
       httpMethod: POST
       exemplarTraceIdDestinations:
         - datasourceUid: Tempo
-          name: traceID
+          name: trace_id
 
   - name: Loki
     type: loki
