@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 1,
   "links": [],
   "panels": [
     {
@@ -26,26 +26,25 @@
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
-      "description": "Percentage of HTTP requests completed in 100ms.",
+      "description": "Percentage of HTTP 5xx responses over total requests.",
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
           "mappings": [],
+          "max": 100,
+          "min": 0,
           "thresholds": {
-            "mode": "percentage",
+            "mode": "absolute",
             "steps": [
               {
-                "color": "red"
+                "color": "green"
               },
               {
                 "color": "yellow",
-                "value": 80
+                "value": 0.5
               },
               {
-                "color": "green",
-                "value": 90
+                "color": "red",
+                "value": 1
               }
             ]
           },
@@ -71,18 +70,20 @@
           "fields": "",
           "values": false
         },
-        "showThresholdLabels": true,
+        "showThresholdLabels": false,
         "showThresholdMarkers": true,
         "sizing": "auto"
       },
       "pluginVersion": "11.6.0",
       "targets": [
         {
-          "expr": "sum(rate(http_server_request_duration_seconds_bucket{le=\"0.1\", job=\"$Service\"}[5m])) / sum(rate(http_server_request_duration_seconds_count{job=\"$Service\"}[5m])) * 100",
+          "expr": "sum(rate(http_server_requests_seconds_count{status=~\"5..\",job=\"$Service\"}[5m]))/sum(rate(http_server_requests_seconds_count{job=\"$Service\"}[5m]))*100",
+          "instant": true,
+          "range": false,
           "refId": "A"
         }
       ],
-      "title": "Latency SLI ≤ 100ms",
+      "title": "HTTP Error Rate (5xx)",
       "type": "gauge"
     },
     {
@@ -90,30 +91,28 @@
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
-      "description": "Percentage of HTTP requests completed in 250ms.",
+      "description": "95th percentile latency of HTTP requests in ms.",
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
           "mappings": [],
+          "min": 0,
           "thresholds": {
-            "mode": "percentage",
+            "mode": "absolute",
             "steps": [
               {
-                "color": "red"
+                "color": "green"
               },
               {
                 "color": "yellow",
-                "value": 90
+                "value": 500
               },
               {
-                "color": "green",
-                "value": 95
+                "color": "red",
+                "value": 1000
               }
             ]
           },
-          "unit": "percent"
+          "unit": "ms"
         },
         "overrides": []
       },
@@ -135,18 +134,18 @@
           "fields": "",
           "values": false
         },
-        "showThresholdLabels": true,
+        "showThresholdLabels": false,
         "showThresholdMarkers": true,
         "sizing": "auto"
       },
       "pluginVersion": "11.6.0",
       "targets": [
         {
-          "expr": "sum(rate(http_server_request_duration_seconds_bucket{le=\"0.25\", job=\"$Service\"}[5m])) / sum(rate(http_server_request_duration_seconds_count{job=\"$Service\"}[5m])) * 100",
+          "expr": "histogram_quantile(0.95,sum by(le)(rate(http_server_request_duration_seconds_bucket{job=\"$Service\"}[5m])))*1000",
           "refId": "A"
         }
       ],
-      "title": "Latency SLI ≤ 250ms",
+      "title": "P95 HTTP Latency",
       "type": "gauge"
     },
     {
@@ -154,30 +153,23 @@
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
-      "description": "Percentage of HTTP requests completed in 500ms.",
+      "description": "Total HTTP requests per second.",
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
           "mappings": [],
           "thresholds": {
-            "mode": "percentage",
+            "mode": "absolute",
             "steps": [
               {
-                "color": "red"
+                "color": "green"
               },
               {
-                "color": "yellow",
-                "value": 95
-              },
-              {
-                "color": "green",
-                "value": 97
+                "color": "red",
+                "value": 80
               }
             ]
           },
-          "unit": "percent"
+          "unit": "reqps"
         },
         "overrides": []
       },
@@ -199,18 +191,18 @@
           "fields": "",
           "values": false
         },
-        "showThresholdLabels": true,
+        "showThresholdLabels": false,
         "showThresholdMarkers": true,
         "sizing": "auto"
       },
       "pluginVersion": "11.6.0",
       "targets": [
         {
-          "expr": "sum(rate(http_server_request_duration_seconds_bucket{le=\"0.5\", job=\"$Service\"}[5m])) / sum(rate(http_server_request_duration_seconds_count{job=\"$Service\"}[5m])) * 100",
+          "expr": "sum(rate(http_server_requests_seconds_count{job=\"$Service\"}[5m]))",
           "refId": "A"
         }
       ],
-      "title": "Latency SLI ≤ 500ms",
+      "title": "HTTP Throughput",
       "type": "gauge"
     },
     {
@@ -218,30 +210,30 @@
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
-      "description": "Percentage of HTTP requests completed in 1s.",
+      "description": "Endpoints with highest average latency.",
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "thresholds"
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
           },
           "mappings": [],
           "thresholds": {
-            "mode": "percentage",
+            "mode": "absolute",
             "steps": [
               {
-                "color": "red"
+                "color": "green"
               },
               {
-                "color": "yellow",
-                "value": 97
-              },
-              {
-                "color": "green",
-                "value": 99
+                "color": "red",
+                "value": 80
               }
             ]
           },
-          "unit": "percent"
+          "unit": "ms"
         },
         "overrides": []
       },
@@ -251,82 +243,122 @@
         "x": 18,
         "y": 0
       },
-      "id": 4,
+      "id": 7,
       "options": {
-        "minVizHeight": 75,
-        "minVizWidth": 75,
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
           "fields": "",
-          "values": false
+          "reducer": [
+            "sum"
+          ],
+          "show": false
         },
-        "showThresholdLabels": true,
-        "showThresholdMarkers": true,
-        "sizing": "auto"
+        "showHeader": true
       },
       "pluginVersion": "11.6.0",
       "targets": [
         {
-          "expr": "sum(rate(http_server_request_duration_seconds_bucket{le=\"1.0\", job=\"$Service\"}[5m])) / sum(rate(http_server_request_duration_seconds_count{job=\"$Service\"}[5m])) * 100",
+          "editorMode": "code",
+          "expr": "topk(5, sum by(uri)(rate(http_server_requests_seconds_sum{job=\"$Service\"}[5m])) / sum by(uri)(rate(http_server_requests_seconds_count{job=\"$Service\"}[5m])) * 1000)",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{uri}}",
+          "range": false,
           "refId": "A"
         }
       ],
-      "title": "Latency SLI ≤ 1s",
-      "type": "gauge"
+      "title": "Top 5 Slowest HTTP Endpoints",
+      "transformations": [
+        {
+          "id": "labelsToFields"
+        }
+      ],
+      "type": "table"
     },
     {
       "datasource": {
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
+      "description": "Percentage of 2xx, 4xx, and 5xx HTTP responses.",
       "fieldConfig": {
         "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
           "mappings": [],
-          "max": 100,
-          "min": 0,
-          "thresholds": {
-            "mode": "percentage",
-            "steps": [
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "2xx"
+            },
+            "properties": [
               {
-                "color": "red"
-              },
-              {
-                "color": "yellow",
-                "value": 1
-              },
-              {
-                "color": "green",
-                "value": 5
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
               }
             ]
           },
-          "unit": "percent"
-        },
-        "overrides": []
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "4xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "5xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 12,
+        "h": 8,
         "w": 6,
         "x": 0,
         "y": 6
       },
-      "id": 9,
+      "id": 4,
       "options": {
-        "displayMode": "gradient",
         "legend": {
-          "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
-          "showLegend": false
+          "showLegend": true
         },
-        "maxVizHeight": 300,
-        "minVizHeight": 16,
-        "minVizWidth": 8,
-        "namePlacement": "auto",
-        "orientation": "auto",
+        "pieType": "pie",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -334,43 +366,45 @@
           "fields": "",
           "values": false
         },
-        "showUnfilled": true,
-        "sizing": "auto",
-        "valueMode": "color"
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "pluginVersion": "11.6.0",
       "targets": [
         {
-          "editorMode": "code",
-          "expr": "sum(rate(http_server_request_duration_seconds_count{http_response_status_code=~\"2..\",job=\"$Service\"}[5m])) / sum(rate(http_server_request_duration_seconds_count{job=\"$Service\"}[5m])) * 100",
-          "legendFormat": "{{http_response_status_code}}",
-          "range": true,
+          "expr": "sum(rate(http_server_requests_seconds_count{status=~\"2..\",job=\"$Service\"}[5m]))/sum(rate(http_server_requests_seconds_count{job=\"$Service\"}[5m]))*100",
+          "instant": true,
+          "legendFormat": "2xx",
+          "range": false,
           "refId": "A"
         },
         {
-          "editorMode": "code",
-          "expr": "sum(rate(http_server_request_duration_seconds_count{http_response_status_code=~\"4..\",job=\"$Service\"}[5m])) / sum(rate(http_server_request_duration_seconds_count{job=\"$Service\"}[5m])) * 100",
-          "legendFormat": "{{http_response_status_code}}",
-          "range": true,
+          "expr": "sum(rate(http_server_requests_seconds_count{status=~\"4..\",job=\"$Service\"}[5m]))/sum(rate(http_server_requests_seconds_count{job=\"$Service\"}[5m]))*100",
+          "instant": true,
+          "legendFormat": "4xx",
+          "range": false,
           "refId": "B"
         },
         {
-          "editorMode": "code",
-          "expr": "sum(rate(http_server_request_duration_seconds_count{http_response_status_code=~\"5..\",job=\"$Service\"}[5m])) / sum(rate(http_server_request_duration_seconds_count{job=\"$Service\"}[5m])) * 100",
-          "legendFormat": "{{http_response_status_code}}",
-          "range": true,
+          "expr": "sum(rate(http_server_requests_seconds_count{status=~\"5..\",job=\"$Service\"}[5m]))/sum(rate(http_server_requests_seconds_count{job=\"$Service\"}[5m]))*100",
+          "instant": true,
+          "legendFormat": "5xx",
+          "range": false,
           "refId": "C"
         }
       ],
-      "title": "HTTP Status Rates (2xx/4xx/5xx)",
-      "type": "bargauge"
+      "title": "HTTP Status Codes Distribution",
+      "type": "piechart"
     },
     {
       "datasource": {
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
-      "description": "Shows number of HTTP requests per second.",
+      "description": "Requests per second by HTTP endpoint.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -428,104 +462,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 18,
+        "w": 9,
         "x": 6,
         "y": 6
-      },
-      "id": 7,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "11.6.0",
-      "targets": [
-        {
-          "editorMode": "code",
-          "exemplar": true,
-          "expr": "sum(rate(http_server_request_duration_seconds_count{job=\"$Service\"}[5m]))",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Request Rate (req/s)",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "description": "Shows how latency SLIs vary over time for each threshold.",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "max": 100,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 18,
-        "x": 6,
-        "y": 14
       },
       "id": 5,
       "options": {
@@ -537,7 +476,7 @@
         },
         "tooltip": {
           "hideZeros": false,
-          "mode": "multi",
+          "mode": "single",
           "sort": "none"
         }
       },
@@ -546,37 +485,13 @@
         {
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum(rate(http_server_request_duration_seconds_bucket{le=\"0.1\", job=\"$Service\"}[5m])) / sum(rate(http_server_request_duration_seconds_count{job=\"$Service\"}[5m])) * 100",
-          "legendFormat": "≤ 0.1s",
+          "expr": "sum by(uri)(rate(http_server_requests_seconds_count{job=\"$Service\"}[5m]))",
+          "legendFormat": "{{uri}}",
           "range": true,
           "refId": "A"
-        },
-        {
-          "editorMode": "code",
-          "exemplar": true,
-          "expr": "sum(rate(http_server_request_duration_seconds_bucket{le=\"0.25\", job=\"$Service\"}[5m])) / sum(rate(http_server_request_duration_seconds_count{job=\"$Service\"}[5m])) * 100",
-          "legendFormat": "≤ 0.25s",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "editorMode": "code",
-          "exemplar": true,
-          "expr": "sum(rate(http_server_request_duration_seconds_bucket{le=\"0.5\", job=\"$Service\"}[5m])) / sum(rate(http_server_request_duration_seconds_count{job=\"$Service\"}[5m])) * 100",
-          "legendFormat": "≤ 0.5s",
-          "range": true,
-          "refId": "C"
-        },
-        {
-          "editorMode": "code",
-          "exemplar": true,
-          "expr": "sum(rate(http_server_request_duration_seconds_bucket{le=\"1.0\", job=\"$Service\"}[5m])) / sum(rate(http_server_request_duration_seconds_count{job=\"$Service\"}[5m])) * 100",
-          "legendFormat": "≤ 1.0s",
-          "range": true,
-          "refId": "D"
         }
       ],
-      "title": "Latency SLI Over Time (≤100ms/250ms/500ms/1s)",
+      "title": "HTTP Throughput by Endpoint",
       "type": "timeseries"
     },
     {
@@ -584,67 +499,7 @@
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "yellow",
-                "value": 300
-              },
-              {
-                "color": "red",
-                "value": 500
-              }
-            ]
-          },
-          "unit": "ms"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 0,
-        "y": 18
-      },
-      "id": 8,
-      "options": {
-        "minVizHeight": 75,
-        "minVizWidth": 75,
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true,
-        "sizing": "auto"
-      },
-      "pluginVersion": "11.6.0",
-      "targets": [
-        {
-          "expr": "histogram_quantile(0.95, sum by (le)(rate(http_server_request_duration_seconds_bucket{job=\"$Service\"}[5m]))) * 1000",
-          "refId": "A"
-        }
-      ],
-      "title": "P95 HTTP Latency",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "description": "Shows estimated average latency in milliseconds.",
+      "description": "Average latency (ms) by HTTP endpoint.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -701,10 +556,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 18,
-        "x": 6,
-        "y": 20
+        "h": 8,
+        "w": 9,
+        "x": 15,
+        "y": 6
       },
       "id": 6,
       "options": {
@@ -712,7 +567,7 @@
           "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
-          "showLegend": false
+          "showLegend": true
         },
         "tooltip": {
           "hideZeros": false,
@@ -725,12 +580,115 @@
         {
           "editorMode": "code",
           "exemplar": true,
-          "expr": "rate(http_server_request_duration_seconds_sum{job=\"$Service\"}[5m]) / rate(http_server_request_duration_seconds_count{job=\"$Service\"}[5m]) * 1000",
+          "expr": "sum by(uri)(rate(http_server_requests_seconds_sum{job=\"$Service\"}[5m]))/sum by(uri)(rate(http_server_requests_seconds_count{job=\"$Service\"}[5m]))*1000",
+          "legendFormat": "{{uri}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Average HTTP Latency (ms)",
+      "title": "HTTP Avg Latency by Endpoint",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "description": "95th percentile latency of HTTP requests (with exemplars).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "yellow",
+                "value": 500
+              },
+              {
+                "color": "red",
+                "value": 1000
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 14
+      },
+      "id": 8,
+      "options": {
+        "drawModes": {
+          "lineInterpolation": "linear"
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "histogram_quantile(0.95, sum by (le)(rate(http_server_request_duration_seconds_bucket{job=\"$Service\"}[5m]))) * 1000",
+          "instant": false,
+          "legendFormat": "P95",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP P95 Latency",
       "type": "timeseries"
     }
   ],
@@ -749,10 +707,15 @@
           "type": "prometheus",
           "uid": "PBFA97CFB590B2093"
         },
+        "definition": "label_values(job)",
         "label": "Service",
         "name": "Service",
         "options": [],
-        "query": "label_values(http_server_request_duration_seconds_bucket,job)",
+        "query": {
+          "qryType": 1,
+          "query": "label_values(job)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
         "refresh": 1,
         "type": "query"
       }
@@ -766,5 +729,5 @@
   "timezone": "browser",
   "title": "Latency and Throughput SLI Dashboard",
   "uid": "3daf03b0-",
-  "version": 1
+  "version": 3
 }
