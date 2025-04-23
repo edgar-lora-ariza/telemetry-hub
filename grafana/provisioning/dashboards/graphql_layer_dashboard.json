@@ -102,21 +102,26 @@
       "description": "Percentage of outcomes (SUCCESS, REQUEST_ERROR, INTERNAL_ERROR) for GraphQL operations.",
       "fieldConfig": {
         "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "View Traces",
+              "url": "/explore?left={\"datasource\":\"Tempo\",\"queries\":[{\"query\":\"{resource.service.name=\\\"${service}\\\" %26%26 span.graphql.outcome=\\\"${__series.name}\\\"}\",\"queryType\":\"traceql\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+            }
+          ],
           "mappings": [],
           "max": 100,
           "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
           "unit": "percent"
         },
         "overrides": [
@@ -178,18 +183,12 @@
       },
       "id": 1,
       "options": {
-        "displayMode": "gradient",
         "legend": {
-          "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
-          "showLegend": false
+          "showLegend": true
         },
-        "maxVizHeight": 300,
-        "minVizHeight": 16,
-        "minVizWidth": 8,
-        "namePlacement": "auto",
-        "orientation": "auto",
+        "pieType": "pie",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -197,40 +196,39 @@
           "fields": "",
           "values": false
         },
-        "showUnfilled": true,
-        "sizing": "auto",
-        "valueMode": "color",
-        "valueOptions": {
-          "placement": "auto",
-          "show": "all"
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
         }
       },
       "pluginVersion": "11.6.0",
       "targets": [
         {
+          "editorMode": "code",
           "expr": "sum(rate(graphql_request_seconds_count{job=\"$service\",graphql_outcome=\"SUCCESS\"}[5m])) / sum(rate(graphql_request_seconds_count{job=\"$service\"}[5m])) * 100",
-          "legendFormat": "SUCCESS",
           "instant": true,
+          "legendFormat": "SUCCESS",
           "range": false,
           "refId": "A"
         },
         {
           "expr": "sum(rate(graphql_request_seconds_count{job=\"$service\",graphql_outcome=\"REQUEST_ERROR\"}[5m])) / sum(rate(graphql_request_seconds_count{job=\"$service\"}[5m])) * 100",
-          "legendFormat": "REQUEST_ERROR",
           "instant": true,
+          "legendFormat": "REQUEST_ERROR",
           "range": false,
           "refId": "B"
         },
         {
           "expr": "sum(rate(graphql_request_seconds_count{job=\"$service\",graphql_outcome=\"INTERNAL_ERROR\"}[5m])) / sum(rate(graphql_request_seconds_count{job=\"$service\"}[5m])) * 100",
-          "legendFormat": "INTERNAL_ERROR",
           "instant": true,
+          "legendFormat": "INTERNAL_ERROR",
           "range": false,
           "refId": "C"
         }
       ],
       "title": "GraphQL Request Outcome Distribution",
-      "type": "bargauge"
+      "type": "piechart"
     },
     {
       "datasource": {
@@ -240,21 +238,26 @@
       "description": "Percentage of outcomes (SUCCESS, ERROR) for GraphQL DataFetchers.",
       "fieldConfig": {
         "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "View Traces",
+              "url": "/explore?left={\"datasource\":\"Tempo\",\"queries\":[{\"query\":\"{resource.service.name=\\\"${service}\\\" %26%26 span.graphql.outcome=\\\"${__series.name}\\\"}\",\"queryType\":\"traceql\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+            }
+          ],
           "mappings": [],
           "max": 100,
           "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
           "unit": "percent"
         },
         "overrides": [
@@ -267,8 +270,8 @@
               {
                 "id": "color",
                 "value": {
-                  "mode": "fixed",
-                  "fixedColor": "green"
+                  "fixedColor": "green",
+                  "mode": "fixed"
                 }
               }
             ]
@@ -282,8 +285,8 @@
               {
                 "id": "color",
                 "value": {
-                  "mode": "fixed",
-                  "fixedColor": "red"
+                  "fixedColor": "red",
+                  "mode": "fixed"
                 }
               }
             ]
@@ -298,18 +301,12 @@
       },
       "id": 4,
       "options": {
-        "displayMode": "gradient",
         "legend": {
-          "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
-          "showLegend": false
+          "showLegend": true
         },
-        "maxVizHeight": 300,
-        "minVizHeight": 16,
-        "minVizWidth": 8,
-        "namePlacement": "auto",
-        "orientation": "auto",
+        "pieType": "pie",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -317,33 +314,31 @@
           "fields": "",
           "values": false
         },
-        "showUnfilled": true,
-        "sizing": "auto",
-        "valueMode": "color",
-        "valueOptions": {
-          "placement": "auto",
-          "show": "all"
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
         }
       },
       "pluginVersion": "11.6.0",
       "targets": [
         {
           "expr": "sum(rate(graphql_datafetcher_seconds_count{job=\"$service\",graphql_outcome=\"SUCCESS\"}[5m])) / sum(rate(graphql_datafetcher_seconds_count{job=\"$service\"}[5m])) * 100",
-          "legendFormat": "SUCCESS",
           "instant": true,
+          "legendFormat": "SUCCESS",
           "range": false,
           "refId": "A"
         },
         {
           "expr": "sum(rate(graphql_datafetcher_seconds_count{job=\"$service\",graphql_outcome=\"ERROR\"}[5m])) / sum(rate(graphql_datafetcher_seconds_count{job=\"$service\"}[5m])) * 100",
-          "legendFormat": "ERROR",
           "instant": true,
+          "legendFormat": "ERROR",
           "range": false,
           "refId": "B"
         }
       ],
       "title": "GraphQL DataFetcher Outcome Distribution",
-      "type": "bargauge"
+      "type": "piechart"
     },
     {
       "datasource": {
@@ -389,6 +384,13 @@
               "mode": "off"
             }
           },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "View Traces",
+              "url": "/explore?left={\"datasource\":\"Tempo\",\"queries\":[{\"query\":\"{resource.service.name=\\\"${service}\\\" %26%26 span.graphql.operation=\\\"${__field.labels.graphql_operation}\\\"}\",\"queryType\":\"traceql\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+            }
+          ],
           "mappings": [],
           "min": 0,
           "thresholds": {
@@ -414,6 +416,13 @@
         "y": 7
       },
       "id": 2,
+      "links": [
+        {
+          "targetBlank": true,
+          "title": "View Traces",
+          "url": "/explore?left={\"datasource\":\"Tempo\",\"queries\":[{\"query\":\"{resource.service.name=\\\"${service}\\\"}\",\"queryType\":\"traceql\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+        }
+      ],
       "options": {
         "legend": {
           "calcs": [],
@@ -488,6 +497,13 @@
               "mode": "off"
             }
           },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "View traces",
+              "url": "/explore?left={\"datasource\":\"Tempo\",\"queries\":[{\"query\":\"{resource.service.name=\\\"${service}\\\" %26%26 span.graphql.operation=\\\"${__field.labels.graphql_field_name}\\\"}\",\"queryType\":\"traceql\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+            }
+          ],
           "mappings": [],
           "min": 0,
           "thresholds": {
@@ -513,6 +529,13 @@
         "y": 7
       },
       "id": 5,
+      "links": [
+        {
+          "targetBlank": true,
+          "title": "View Traces",
+          "url": "/explore?left={\"datasource\":\"Tempo\",\"queries\":[{\"query\":\"{resource.service.name=\\\"${service}\\\"}\",\"queryType\":\"traceql\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+        }
+      ],
       "options": {
         "legend": {
           "calcs": [],
@@ -587,6 +610,13 @@
               "mode": "off"
             }
           },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "View Traces",
+              "url": "/explore?left={\"datasource\":\"Tempo\",\"queries\":[{\"query\":\"{resource.service.name=\\\"${service}\\\" %26%26 span.graphql.operation=\\\"${__field.labels.graphql_operation}\\\"}\",\"queryType\":\"traceql\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+            }
+          ],
           "mappings": [],
           "min": 0,
           "thresholds": {
@@ -603,32 +633,7 @@
           },
           "unit": "ms"
         },
-        "overrides": [
-          {
-            "__systemRef": "hideSeriesFrom",
-            "matcher": {
-              "id": "byNames",
-              "options": {
-                "mode": "exclude",
-                "names": [
-                  "query"
-                ],
-                "prefix": "All except:",
-                "readOnly": true
-              }
-            },
-            "properties": [
-              {
-                "id": "custom.hideFrom",
-                "value": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": true
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 8,
@@ -637,6 +642,13 @@
         "y": 14
       },
       "id": 3,
+      "links": [
+        {
+          "targetBlank": true,
+          "title": "View Traces",
+          "url": "/explore?left={\"datasource\":\"Tempo\",\"queries\":[{\"query\":\"{resource.service.name=\\\"${service}\\\"}\",\"queryType\":\"traceql\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+        }
+      ],
       "options": {
         "legend": {
           "calcs": [],
@@ -711,6 +723,13 @@
               "mode": "off"
             }
           },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "View Traces",
+              "url": "/explore?left={\"datasource\":\"Tempo\",\"queries\":[{\"query\":\"{resource.service.name=\\\"${service}\\\" %26%26 span.graphql.operation=\\\"${__field.labels.graphql_field_name}\\\"}\",\"queryType\":\"traceql\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+            }
+          ],
           "mappings": [],
           "min": 0,
           "thresholds": {
@@ -736,6 +755,13 @@
         "y": 14
       },
       "id": 6,
+      "links": [
+        {
+          "targetBlank": true,
+          "title": "View Traces",
+          "url": "/explore?left={\"datasource\":\"Tempo\",\"queries\":[{\"query\":\"{resource.service.name=\\\"${service}\\\"}\",\"queryType\":\"traceql\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+        }
+      ],
       "options": {
         "legend": {
           "calcs": [],
