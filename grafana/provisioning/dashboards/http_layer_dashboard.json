@@ -733,7 +733,10 @@
   "preload": false,
   "refresh": "5s",
   "schemaVersion": 41,
-  "tags": [],
+  "tags": [
+    "Http",
+    "Observability"
+  ],
   "templating": {
     "list": [
       {

@@ -794,7 +794,10 @@
   "preload": false,
   "refresh": "5s",
   "schemaVersion": 41,
-  "tags": [],
+  "tags": [
+    "GraphQL",
+    "Observability"
+  ],
   "templating": {
     "list": [
       {
