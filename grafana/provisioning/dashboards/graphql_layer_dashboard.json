@@ -832,8 +832,8 @@
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "",
-  "title": "GraphQL Observability Dashboard",
-  "uid": "graphql-observability",
+  "timezone": "browser",
+  "title": "GraphQL Layer Dashboard",
+  "uid": "graphql-layer-dashboard",
   "version": 2
 }
