@@ -77,7 +77,7 @@
       "pluginVersion": "11.6.0",
       "targets": [
         {
-          "expr": "sum(rate(http_server_requests_seconds_count{status=~\"5..\",job=\"$Service\"}[5m]))/sum(rate(http_server_requests_seconds_count{job=\"$Service\"}[5m]))*100",
+          "expr": "sum(rate(http_server_requests_seconds_count{status=~\"5..\",job=\"$service\"}[5m]))/sum(rate(http_server_requests_seconds_count{job=\"$service\"}[5m]))*100",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -141,7 +141,7 @@
       "pluginVersion": "11.6.0",
       "targets": [
         {
-          "expr": "histogram_quantile(0.95,sum by(le)(rate(http_server_request_duration_seconds_bucket{job=\"$Service\"}[5m])))*1000",
+          "expr": "histogram_quantile(0.95,sum by(le)(rate(http_server_request_duration_seconds_bucket{job=\"$service\"}[5m])))*1000",
           "refId": "A"
         }
       ],
@@ -198,7 +198,7 @@
       "pluginVersion": "11.6.0",
       "targets": [
         {
-          "expr": "sum(rate(http_server_requests_seconds_count{job=\"$Service\"}[5m]))",
+          "expr": "sum(rate(http_server_requests_seconds_count{job=\"$service\"}[5m]))",
           "refId": "A"
         }
       ],
@@ -260,7 +260,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(5, sum by(uri)(rate(http_server_requests_seconds_sum{job=\"$Service\"}[5m])) / sum by(uri)(rate(http_server_requests_seconds_count{job=\"$Service\"}[5m])) * 1000)",
+          "expr": "topk(5, sum by(uri)(rate(http_server_requests_seconds_sum{job=\"$service\"}[5m])) / sum by(uri)(rate(http_server_requests_seconds_count{job=\"$service\"}[5m])) * 1000)",
           "format": "table",
           "instant": true,
           "legendFormat": "{{uri}}",
@@ -294,6 +294,13 @@
               "viz": false
             }
           },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "View Traces",
+              "url": "/explore?left={\"datasource\":\"Tempo\",\"queries\":[{\"query\":\"{resource.service.name=\\\"${service}\\\" %26%26 span.http.response.status_code=${__field.labels.status}}\",\"queryType\":\"traceql\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+            }
+          ],
           "mappings": [],
           "unit": "percent"
         },
@@ -375,25 +382,42 @@
       "pluginVersion": "11.6.0",
       "targets": [
         {
-          "expr": "sum(rate(http_server_requests_seconds_count{status=~\"2..\",job=\"$Service\"}[5m]))/sum(rate(http_server_requests_seconds_count{job=\"$Service\"}[5m]))*100",
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "(sum by(status) (rate(http_server_requests_seconds_count{status=~\"2..\", job=\"$service\"}[5m])) * 100) / sum by(status) (rate(http_server_requests_seconds_count{job=\"$service\"}[5m]))",
+          "format": "time_series",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
           "instant": true,
-          "legendFormat": "2xx",
+          "legendFormat": "{{status}}",
           "range": false,
-          "refId": "A"
+          "refId": "A",
+          "useBackend": false
         },
         {
-          "expr": "sum(rate(http_server_requests_seconds_count{status=~\"4..\",job=\"$Service\"}[5m]))/sum(rate(http_server_requests_seconds_count{job=\"$Service\"}[5m]))*100",
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "expr": "(sum by(status) (rate(http_server_requests_seconds_count{status=~\"4..\", job=\"$service\"}[5m])) * 100) / sum by(status) (rate(http_server_requests_seconds_count{job=\"$service\"}[5m]))",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
           "instant": true,
-          "legendFormat": "4xx",
+          "legendFormat": "{{status}}",
           "range": false,
-          "refId": "B"
+          "refId": "B",
+          "useBackend": false
         },
         {
-          "expr": "sum(rate(http_server_requests_seconds_count{status=~\"5..\",job=\"$Service\"}[5m]))/sum(rate(http_server_requests_seconds_count{job=\"$Service\"}[5m]))*100",
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "expr": "(sum by(status) (rate(http_server_requests_seconds_count{status=~\"5..\", job=\"$service\"}[5m])) * 100) / sum by(status) (rate(http_server_requests_seconds_count{job=\"$service\"}[5m]))",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
           "instant": true,
-          "legendFormat": "5xx",
+          "legendFormat": "{{status}}",
           "range": false,
-          "refId": "C"
+          "refId": "C",
+          "useBackend": false
         }
       ],
       "title": "HTTP Status Codes Distribution",
@@ -443,6 +467,13 @@
               "mode": "off"
             }
           },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "View Traces",
+              "url": "/explore?left={\"datasource\":\"Tempo\",\"queries\":[{\"query\":\"{resource.service.name=\\\"${service}\\\" %26%26 span.http.url=\\\"/${service}${__field.labels.uri}\\\"}\",\"queryType\":\"traceql\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -485,7 +516,7 @@
         {
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum by(uri)(rate(http_server_requests_seconds_count{job=\"$Service\"}[5m]))",
+          "expr": "sum by(uri)(rate(http_server_requests_seconds_count{job=\"$service\"}[5m]))",
           "legendFormat": "{{uri}}",
           "range": true,
           "refId": "A"
@@ -538,6 +569,13 @@
               "mode": "off"
             }
           },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "View Traces",
+              "url": "/explore?left={\"datasource\":\"Tempo\",\"queries\":[{\"query\":\"{resource.service.name=\\\"${service}\\\" %26%26 span.http.url=\\\"/${service}${__field.labels.uri}\\\"}\",\"queryType\":\"traceql\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -580,7 +618,7 @@
         {
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum by(uri)(rate(http_server_requests_seconds_sum{job=\"$Service\"}[5m]))/sum by(uri)(rate(http_server_requests_seconds_count{job=\"$Service\"}[5m]))*1000",
+          "expr": "sum by(uri)(rate(http_server_requests_seconds_sum{job=\"$service\"}[5m]))/sum by(uri)(rate(http_server_requests_seconds_count{job=\"$service\"}[5m]))*1000",
           "legendFormat": "{{uri}}",
           "range": true,
           "refId": "A"
@@ -681,7 +719,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "histogram_quantile(0.95, sum by (le)(rate(http_server_request_duration_seconds_bucket{job=\"$Service\"}[5m]))) * 1000",
+          "expr": "histogram_quantile(0.95, sum by (le)(rate(http_server_request_duration_seconds_bucket{job=\"$service\"}[5m]))) * 1000",
           "instant": false,
           "legendFormat": "P95",
           "range": true,
@@ -708,8 +746,8 @@
           "uid": "PBFA97CFB590B2093"
         },
         "definition": "label_values(job)",
-        "label": "Service",
-        "name": "Service",
+        "label": "service",
+        "name": "service",
         "options": [],
         "query": {
           "qryType": 1,
@@ -727,7 +765,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Latency and Throughput SLI Dashboard",
-  "uid": "3daf03b0-",
-  "version": 3
+  "title": "HTTP Layer Dashboard",
+  "uid": "http-layer-dashboard",
+  "version": 1
 }
