@@ -141,7 +141,7 @@
       "pluginVersion": "11.6.0",
       "targets": [
         {
-          "expr": "histogram_quantile(0.95,sum by(le)(rate(http_server_request_duration_seconds_bucket{job=\"$service\"}[5m])))*1000",
+          "expr": "histogram_quantile(0.95,sum by(le)(rate(http_server_requests_seconds_bucket{job=\"$service\"}[5m])))*1000",
           "refId": "A"
         }
       ],
@@ -470,8 +470,8 @@
           "links": [
             {
               "targetBlank": true,
-              "title": "View Traces",
-              "url": "/explore?left={\"datasource\":\"Tempo\",\"queries\":[{\"query\":\"{resource.service.name=\\\"${service}\\\" %26%26 span.http.url=\\\"/${service}${__field.labels.uri}\\\"}\",\"queryType\":\"traceql\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+              "title": "View Traces for {{__field.labels['uri']}}",
+              "url": "/explore?left={\"datasource\":\"Tempo\",\"queries\":[{\"query\":\"{resource.service.name=\\\"${service}\\\" %26%26 span.uri=\\\"${__field.labels['uri']}\\\"}\",\"queryType\":\"traceql\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
             }
           ],
           "mappings": [],
@@ -572,8 +572,8 @@
           "links": [
             {
               "targetBlank": true,
-              "title": "View Traces",
-              "url": "/explore?left={\"datasource\":\"Tempo\",\"queries\":[{\"query\":\"{resource.service.name=\\\"${service}\\\" %26%26 span.http.url=\\\"/${service}${__field.labels.uri}\\\"}\",\"queryType\":\"traceql\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+              "title": "View Traces for {{__field.labels['uri']}}",
+              "url": "/explore?left={\"datasource\":\"Tempo\",\"queries\":[{\"query\":\"{resource.service.name=\\\"${service}\\\" %26%26 span.uri=\\\"${__field.labels['uri']}\\\"}\",\"queryType\":\"traceql\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
             }
           ],
           "mappings": [],
@@ -719,7 +719,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "histogram_quantile(0.95, sum by (le)(rate(http_server_request_duration_seconds_bucket{job=\"$service\"}[5m]))) * 1000",
+          "expr": "histogram_quantile(0.95, sum by (le)(rate(http_server_requests_seconds_bucket{job=\"$service\"}[5m]))) * 1000",
           "instant": false,
           "legendFormat": "P95",
           "range": true,
