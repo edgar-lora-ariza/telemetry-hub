@@ -77,7 +77,7 @@
       "pluginVersion": "11.6.0",
       "targets": [
         {
-          "expr": "sum(rate(http_server_requests_seconds_count{status=~\"5..\",job=\"$service\"}[5m]))/sum(rate(http_server_requests_seconds_count{job=\"$service\"}[5m]))*100",
+          "expr": "sum(rate(http_server_request_duration_seconds_count{http_response_status_code=~\"5..\",job=\"$service\"}[5m]))/sum(rate(http_server_request_duration_seconds_count{job=\"$service\"}[5m]))*100",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -141,7 +141,7 @@
       "pluginVersion": "11.6.0",
       "targets": [
         {
-          "expr": "histogram_quantile(0.95,sum by(le)(rate(http_server_requests_seconds_bucket{job=\"$service\"}[5m])))*1000",
+          "expr": "histogram_quantile(0.95,sum by(le)(rate(http_server_request_duration_seconds_bucket{job=\"$service\"}[5m])))*1000",
           "refId": "A"
         }
       ],
@@ -198,7 +198,7 @@
       "pluginVersion": "11.6.0",
       "targets": [
         {
-          "expr": "sum(rate(http_server_requests_seconds_count{job=\"$service\"}[5m]))",
+          "expr": "sum(rate(http_server_request_duration_seconds_count{job=\"$service\"}[5m]))",
           "refId": "A"
         }
       ],
@@ -260,10 +260,10 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(5, sum by(uri)(rate(http_server_requests_seconds_sum{job=\"$service\"}[5m])) / sum by(uri)(rate(http_server_requests_seconds_count{job=\"$service\"}[5m])) * 1000)",
+          "expr": "topk(5, sum by(http_route)(rate(http_server_request_duration_seconds_sum{job=\"$service\"}[5m])) / sum by(http_route)(rate(http_server_request_duration_seconds_count{job=\"$service\"}[5m])) * 1000)",
           "format": "table",
           "instant": true,
-          "legendFormat": "{{uri}}",
+          "legendFormat": "{{http_route}}",
           "range": false,
           "refId": "A"
         }
@@ -298,7 +298,7 @@
             {
               "targetBlank": true,
               "title": "View Traces",
-              "url": "/explore?left={\"datasource\":\"Tempo\",\"queries\":[{\"query\":\"{resource.service.name=\\\"${service}\\\" %26%26 span.http.response.status_code=${__field.labels.status}}\",\"queryType\":\"traceql\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
+              "url": "/explore?left={\"datasource\":\"Tempo\",\"queries\":[{\"query\":\"{resource.service.name=\\\"${service}\\\" %26%26 span.http.response.status_code=${__field.labels.http_response_status_code}}\",\"queryType\":\"traceql\",\"refId\":\"A\"}],\"range\":{\"from\":\"$__from\",\"to\":\"$__to\"}}"
             }
           ],
           "mappings": [],
@@ -385,7 +385,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "(sum by(status) (rate(http_server_requests_seconds_count{status=~\"2..\", job=\"$service\"}[5m])) * 100) / sum by(status) (rate(http_server_requests_seconds_count{job=\"$service\"}[5m]))",
+          "expr": "(sum by(http_response_status_code) (rate(http_server_request_duration_seconds_count{http_response_status_code=~\"2..\", job=\"$service\"}[5m])) * 100) / sum by(http_response_status_code) (rate(http_server_request_duration_seconds_count{job=\"$service\"}[5m]))",
           "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
@@ -398,11 +398,11 @@
         {
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "(sum by(status) (rate(http_server_requests_seconds_count{status=~\"4..\", job=\"$service\"}[5m])) * 100) / sum by(status) (rate(http_server_requests_seconds_count{job=\"$service\"}[5m]))",
+          "expr": "(sum by(http_response_status_code) (rate(http_server_request_duration_seconds_count{http_response_status_code=~\"4..\", job=\"$service\"}[5m])) * 100) / sum by(http_response_status_code) (rate(http_server_request_duration_seconds_count{job=\"$service\"}[5m]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": true,
-          "legendFormat": "{{status}}",
+          "legendFormat": "{{status_code}}",
           "range": false,
           "refId": "B",
           "useBackend": false
@@ -410,7 +410,7 @@
         {
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "(sum by(status) (rate(http_server_requests_seconds_count{status=~\"5..\", job=\"$service\"}[5m])) * 100) / sum by(status) (rate(http_server_requests_seconds_count{job=\"$service\"}[5m]))",
+          "expr": "(sum by(http_response_status_code) (rate(http_server_request_duration_seconds_count{http_response_status_code=~\"5..\", job=\"$service\"}[5m])) * 100) / sum by(http_response_status_code) (rate(http_server_request_duration_seconds_count{job=\"$service\"}[5m]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": true,
@@ -516,8 +516,8 @@
         {
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum by(uri)(rate(http_server_requests_seconds_count{job=\"$service\"}[5m]))",
-          "legendFormat": "{{uri}}",
+          "expr": "sum by(http_route)(rate(http_server_request_duration_seconds_count{job=\"$service\"}[5m]))",
+          "legendFormat": "{{http_route}}",
           "range": true,
           "refId": "A"
         }
@@ -618,8 +618,8 @@
         {
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum by(uri)(rate(http_server_requests_seconds_sum{job=\"$service\"}[5m]))/sum by(uri)(rate(http_server_requests_seconds_count{job=\"$service\"}[5m]))*1000",
-          "legendFormat": "{{uri}}",
+          "expr": "sum by(http_route)(rate(http_server_request_duration_seconds_sum{job=\"$service\"}[5m]))/sum by(http_route)(rate(http_server_request_duration_seconds_count{job=\"$service\"}[5m]))*1000",
+          "legendFormat": "{{http_route}}",
           "range": true,
           "refId": "A"
         }
@@ -719,7 +719,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "histogram_quantile(0.95, sum by (le)(rate(http_server_requests_seconds_bucket{job=\"$service\"}[5m]))) * 1000",
+          "expr": "histogram_quantile(0.95, sum by (le)(rate(http_server_request_duration_seconds_bucket{job=\"$service\"}[5m]))) * 1000",
           "instant": false,
           "legendFormat": "P95",
           "range": true,
